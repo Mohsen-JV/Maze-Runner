@@ -5,8 +5,61 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MazeRuner"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="600">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="80*"/>
+            <ColumnDefinition Width="30*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Border Grid.Column="1" Margin="5" BorderBrush="Gray" BorderThickness="1" Padding="5">
+            <StackPanel Orientation="Vertical" >
+                <Grid Margin="0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Label Content="Width:" Margin="2"/>
+                    <TextBox x:Name="Width"  Grid.Column="1" Margin="2"/>
+                    <Label Content="Height:" Grid.Row="1" Margin="2"/>
+                    <TextBox x:Name="Height" Grid.Row="1" Grid.Column="1" Margin="2"/>
+                    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal">
+                        <RadioButton Content="4+" Margin="10,0"/>
+                        <RadioButton Content="8*" Margin="10,0"/>
+                    </StackPanel>
+                    <Label Grid.Row="3" Content="Speed:" Margin="5,0"/>
+                    <TextBox x:Name="Speed" Grid.Row="3" Grid.Column="1" Margin="2"/>
+                </Grid>
+                <StackPanel Orientation="Horizontal">
+                </StackPanel>
+                <Button Content="Go" />
+                <Button Content="Reset"/>
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Margin" Value="5"/>
+                    </Style>
+                </StackPanel.Resources>
+            </StackPanel>
+        </Border>
+        <Border BorderBrush="Gray" BorderThickness="1" Margin="5" Padding="5">
+
+        </Border>
+        <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="1" Grid.ColumnSpan="2">
+
+            <StatusBar Background="Gainsboro" Grid.Row="1" Grid.ColumnSpan="2">
+                <Label Content="StatusBar"/>
+
+            </StatusBar>
+        </Border>
+
     </Grid>
 </Window>
