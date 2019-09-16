@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -25,6 +26,11 @@ namespace MazeRuner.Panels
                         rec.Stroke = Brushes.Black;
                         rec.Width = _minWide;
                         rec.Height = _minWide;
+                        rec.MouseUp += (sender, e) =>
+                          {
+                              var r = e.OriginalSource as Rectangle;
+                              r.Fill = r.Fill == Brushes.Black ? Brushes.GhostWhite : Brushes.Black;
+                          };
                         Children.Add(rec);
                     }
                     ResetRectColour();
@@ -55,6 +61,11 @@ namespace MazeRuner.Panels
                         rec.Stroke = Brushes.Black;
                         rec.Width = _minWide;
                         rec.Height = _minWide;
+                        rec.MouseUp += (sender, e) =>
+                        {
+                            var r = e.OriginalSource as Rectangle;
+                            r.Fill = r.Fill == Brushes.Black ? Brushes.GhostWhite : Brushes.Black;
+                        };
                         Children.Add(rec);
                     }
                     ResetRectColour();
@@ -68,13 +79,13 @@ namespace MazeRuner.Panels
                 _Column = value;
             }
         }
-        public SolidColorBrush this[int i,int j]
+        public SolidColorBrush this[int i, int j]
         {
             get => (Children[i * _Column + j] as Rectangle).Fill
                 as SolidColorBrush;
             set => (Children[i * _Column + j] as Rectangle).Fill = value;
         }
-        protected override Size MeasureOverride(Size availableSize) => new Size(_Column*_minWide,_Row*_minWide);
+        protected override Size MeasureOverride(Size availableSize) => new Size(_Column * _minWide, _Row * _minWide);
         protected override Size ArrangeOverride(Size finalSize)
         {
             Point p = new Point(0, 0);
@@ -91,7 +102,7 @@ namespace MazeRuner.Panels
         {
             foreach (var child in Children)
             {
-                (child as Rectangle).Fill= Brushes.WhiteSmoke;
+                (child as Rectangle).Fill = Brushes.WhiteSmoke;
             }
         }
     }

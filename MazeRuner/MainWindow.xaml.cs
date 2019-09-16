@@ -16,6 +16,8 @@ namespace MazeRuner
         Maze MazeMatrix;
         System.Timers.Timer Clock;
         Stack<ValueTuple<int, int>> Path;
+        bool isCancel;
+        bool isPause;
         public MainWindow()
         {
             InitializeComponent();
@@ -24,34 +26,48 @@ namespace MazeRuner
             Path = new Stack<(int, int)>();
             Clock = new System.Timers.Timer();
             Speed.Text = "1000";
+            Clock.Elapsed += (s, e) => Clock.Stop();
             Clock.Elapsed += TimeElapse;
             Clock.Start();
+            isPause = false;
+            isCancel = false;
         }
 
         void TimeElapse(object sender, System.Timers.ElapsedEventArgs e)
         {
             Monitor.Enter("ClockLock");
-            Monitor.Pulse("ClockLock");
+            if (!isPause)
+                Monitor.Pulse("ClockLock");
             Monitor.Wait("ClockLock");
             Monitor.Exit("ClockLock");
+            Clock.Start();
         }
 
         void FindPath()
         {
             bool is8dir = false;
-            Dispatcher.Invoke(() => is8dir = RBIs8Dir.IsChecked.Value);
-            Monitor.Enter("ClockLock");
-            Block temp, temp2;
-            if (Path.Count != 0)
+            Dispatcher.Invoke(() =>
             {
+                is8dir = RBIs8Dir.IsChecked.Value;
                 for (int i = 0; i < MazeMatrix.Row; i++)
                     for (int j = 0; j < MazeMatrix.Column; j++)
-                        if (MazeMatrix[i, j].Seen || (i == MazeMatrix.Row - 1 && j == MazeMatrix.Column - 1))
+                        if (MazeBlocks[i, j] == Brushes.Black)
+                        {
+                            MazeMatrix[i, j] = new Block();
+                        }
+                        else if (MazeMatrix[i, j].IsWall)
                         {
                             MazeMatrix[i, j] = new Block(is8dir);
-                            Dispatcher.Invoke(() => MazeBlocks[i, j] = Brushes.GhostWhite);
+                            MazeBlocks[i, j] = Brushes.GhostWhite;
                         }
-            }
+                        else
+                        {
+                            MazeMatrix[i, j] = new Block(is8dir);
+                            MazeBlocks[i, j] = Brushes.GhostWhite;
+                        }
+            });
+            Monitor.Enter("ClockLock");
+            Block temp, temp2;
             Path.Clear();
             Path.Push((0, 0));
             Dispatcher.Invoke(() => MazeBlocks[0, 0] = Brushes.Yellow);
@@ -72,11 +88,24 @@ namespace MazeRuner
                 }
                 if (temp.Checked)
                 {
+                    if (isCancel)
+                    {
+                        isCancel = false;
+                        Monitor.Exit("ClockLock");
+                        return;
+                    }
                     Monitor.Pulse("ClockLock");
                     Monitor.Wait("ClockLock");
                     Dispatcher.Invoke(() => MazeBlocks[Path.Peek().Item1, Path.Peek().Item2] = Brushes.Red);
                     Path.Pop();
+                    if (Path.Count == 0) break;
                     continue;
+                }
+                if (isCancel)
+                {
+                    isCancel = false;
+                    Monitor.Exit("ClockLock");
+                    return;
                 }
                 Monitor.Pulse("ClockLock");
                 Monitor.Wait("ClockLock");
@@ -102,13 +131,27 @@ namespace MazeRuner
 
         private void Go_Click(object sender, RoutedEventArgs e)
         {
-            Task t = new Task(FindPath);
+            Cancel.Visibility = Visibility.Visible;
+            Pause.Visibility = Visibility.Visible;
             Go.IsEnabled = false;
-            t.ContinueWith((dd) =>
+            Reset.IsEnabled = false;
+            MazeBlocks.IsEnabled = false;
+            Row.IsEnabled = false;
+            Column.IsEnabled = false;
+            var ThrPath = new Task(FindPath);
+            ThrPath.ContinueWith((dd) =>
             {
-                Dispatcher.Invoke(() => Go.IsEnabled = true);
+                Dispatcher.Invoke(() =>
+                {
+                    Pause.Visibility = Visibility.Hidden;
+                    Cancel.Visibility = Visibility.Hidden;
+                    Go.IsEnabled = Reset.IsEnabled = true;
+                    MazeBlocks.IsEnabled = true;
+                    Row.IsEnabled = true;
+                    Column.IsEnabled = true;
+                });
             });
-            t.Start();
+            ThrPath.Start();
         }
 
         private void Speed_TextChanged(object sender, TextChangedEventArgs e)
@@ -122,10 +165,42 @@ namespace MazeRuner
         {
             for (int i = 0; i < MazeMatrix.Row; i++)
                 for (int j = 0; j < MazeMatrix.Column; j++)
-                {
-                    MazeMatrix[i, j] = new Block(RBIs8Dir.IsChecked.Value);
-                    MazeBlocks[i, j] = Brushes.GhostWhite;
-                }
+                    if ((MazeMatrix[i, j].Seen || (i == MazeMatrix.Row - 1 && j == MazeMatrix.Column - 1))&&MazeBlocks[i,j]!=Brushes.Black)
+                    {
+                        MazeMatrix[i, j] = new Block(RBIs8Dir.IsChecked.Value);
+                        MazeBlocks[i, j] = Brushes.GhostWhite;
+                    }
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            isCancel = true;
+            if(isPause)
+            {
+                isPause = false;
+                Pause.Content = "Pause";
+                Monitor.Enter("ClockLock");
+                Monitor.Pulse("ClockLock");
+                Monitor.Exit("ClockLock");
+            }
+            (e.OriginalSource as Button).Visibility = Visibility.Hidden;
+        }
+
+        private void Pause_Click(object sender, RoutedEventArgs e)
+        {
+            if (isPause)
+            {
+                isPause = false;
+                Pause.Content = "Pause";
+                Monitor.Enter("ClockLock");
+                Monitor.Pulse("ClockLock");
+                Monitor.Exit("ClockLock");
+            }
+            else
+            {
+                isPause = true;
+                Pause.Content = "Continue";
+            }
         }
     }
 }

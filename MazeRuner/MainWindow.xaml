@@ -44,6 +44,8 @@
                 </StackPanel>
                 <Button x:Name="Go" Content="Go" Click="Go_Click" />
                 <Button x:Name="Reset" Content="Reset" Click="Reset_Click"/>
+                <Button x:Name="Pause" Visibility="Hidden" Click="Pause_Click">Pause</Button>
+                <Button x:Name="Cancel" Visibility="Hidden" Click="Cancel_Click">Cancel</Button>
                 <StackPanel.Resources>
                     <Style TargetType="Button">
                         <Setter Property="Margin" Value="5"/>
