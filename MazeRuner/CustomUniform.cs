@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Threading.Tasks;
 
 namespace MazeRuner.Panels
 {
@@ -71,9 +68,10 @@ namespace MazeRuner.Panels
                 _Column = value;
             }
         }
-        public Brush this[int i,int j]
+        public SolidColorBrush this[int i,int j]
         {
-            get => (Children[i * _Column + j] as Rectangle).Fill;
+            get => (Children[i * _Column + j] as Rectangle).Fill
+                as SolidColorBrush;
             set => (Children[i * _Column + j] as Rectangle).Fill = value;
         }
         protected override Size MeasureOverride(Size availableSize) => new Size(_Column*_minWide,_Row*_minWide);
