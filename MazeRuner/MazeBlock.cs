@@ -1,36 +1,44 @@
-﻿namespace MazeRuner
+﻿using System.Linq;
+using System.Collections.Generic;
+using System;
+namespace MazeRuner
 {
     public enum Direcion { Null, N, NE, E, SE, S, SW, W, NW }
     public class Block
     {
+        Stack<Direcion> NDir;
         public bool IsWall = false;
         public bool Seen = false;
         public bool Checked = false;
         bool Is8Dir = false;
         Direcion _Dir = Direcion.Null;
-        Direcion NextDirection(Direcion dir)
-        {
-            if (Is8Dir)
-                return dir == Direcion.NW ? Direcion.N : dir + 1;
-            else return dir == Direcion.W ? Direcion.N : dir + 2;
-        }
         public Block() => IsWall = true;
         public Block(bool is8dir) => Is8Dir = is8dir;
         public void NextDir()
         {
             if (_Dir != Direcion.Null)
             {
-                _Dir = NextDirection(_Dir);
-                if (_Dir == Direcion.E)
-                {
-                    Checked = true;
-                    _Dir = Direcion.Null;
-                }
+                _Dir = NDir.Pop();
+                if (_Dir == Direcion.Null) Checked = true;
             }
             else
             {
                 Seen = true;
-                _Dir = Direcion.E;
+                NDir = new Stack<Direcion>();
+                NDir.Push(Direcion.Null);
+                var r = new Random();
+                List<int> l;
+                if(Is8Dir)
+                    l=(new int[] { 1, 2, 3, 4, 5, 6, 7, 8 }).ToList();
+                else l= (new int[] { 1, 3, 5, 7 }).ToList();
+                var count = l.Count;
+                for (int i = 0; i <count;i++)
+                {
+                    var temp = r.Next(l.Count);
+                    NDir.Push((Direcion)l[temp]);
+                    l.RemoveAt(temp);
+                }
+                _Dir = NDir.Pop();
             }
         }
         public int NextDir_w

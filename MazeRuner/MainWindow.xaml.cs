@@ -152,6 +152,7 @@ namespace MazeRuner
                 });
             });
             ThrPath.Start();
+            Sts.Content = "Running";
         }
 
         private void Speed_TextChanged(object sender, TextChangedEventArgs e)
@@ -175,6 +176,7 @@ namespace MazeRuner
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             isCancel = true;
+            Sts.Content = "";
             if(isPause)
             {
                 isPause = false;
@@ -190,6 +192,7 @@ namespace MazeRuner
         {
             if (isPause)
             {
+                Sts.Content = "Running";
                 isPause = false;
                 Pause.Content = "Pause";
                 Monitor.Enter("ClockLock");
@@ -198,6 +201,7 @@ namespace MazeRuner
             }
             else
             {
+                Sts.Content = "Pause";
                 isPause = true;
                 Pause.Content = "Continue";
             }

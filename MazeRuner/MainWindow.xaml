@@ -62,7 +62,7 @@
         <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="1" Grid.ColumnSpan="2">
 
             <StatusBar Background="Gainsboro" Grid.Row="1" Grid.ColumnSpan="2">
-                <Label Content="StatusBar"/>
+                <Label Name="Sts" Content=""/>
 
             </StatusBar>
         </Border>
